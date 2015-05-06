@@ -44,16 +44,86 @@ result = changeset.apply(old_data)
 
 # Revert changes to produce old version from new
 original = changeset.revert(new_data)
+```
 
-# Ignore specific paths
-changeset = Philiprehberger::Differ.diff(old_data, new_data, ignore: ['age'])
+### Ignore Paths
+
+Exclude specific keys from comparison. Supports both symbols and dot-notation strings for nested paths:
+
+```ruby
+changeset = Philiprehberger::Differ.diff(old_data, new_data, ignore: [:updated_at, :metadata])
+
+# Ignore nested paths
+changeset = Philiprehberger::Differ.diff(old_data, new_data, ignore: ['user.email', 'meta.version'])
+```
+
+### Similarity Score
+
+Get a ratio of unchanged fields to total fields, returned as a Float between 0.0 and 1.0:
+
+```ruby
+score = Philiprehberger::Differ.similarity(old_data, new_data)
+# => 0.5  (half the fields are identical)
+
+score = Philiprehberger::Differ.similarity(old_data, old_data)
+# => 1.0  (identical)
+```
+
+### Text Formatter
+
+Human-readable text output with +/- prefixes:
+
+```ruby
+changeset = Philiprehberger::Differ.diff(
+  { name: 'Alice', age: 30 },
+  { name: 'Bob', email: 'bob@example.com' }
+)
+
+puts changeset.to_text
+# ~ name: "Alice" -> "Bob"
+# - age: 30
+# + email: "bob@example.com"
+```
+
+### JSON Patch Format
+
+Returns an array of RFC 6902 JSON Patch operations:
+
+```ruby
+changeset = Philiprehberger::Differ.diff(
+  { name: 'Alice', age: 30 },
+  { name: 'Bob' }
+)
+
+changeset.to_json_patch
+# => [
+#   { op: "replace", path: "/name", value: "Bob" },
+#   { op: "remove", path: "/age" }
+# ]
+```
+
+### Nested Array Diff by Key
+
+Match array elements by a key field instead of index for smarter array comparison:
+
+```ruby
+old_data = { users: [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }] }
+new_data = { users: [{ id: 2, name: 'Bobby' }, { id: 1, name: 'Alice' }] }
+
+# Without array_key: detects changes at every index (order-sensitive)
+# With array_key: matches by :id, only detects Bob -> Bobby change
+changeset = Philiprehberger::Differ.diff(old_data, new_data, array_key: :id)
 ```
 
 ## API
 
-### `Philiprehberger::Differ.diff(old_val, new_val, ignore: [])`
+### `Philiprehberger::Differ.diff(old_val, new_val, ignore: [], array_key: nil)`
 
 Returns a `Changeset` representing all structural differences.
+
+### `Philiprehberger::Differ.similarity(old_val, new_val, ignore: [], array_key: nil)`
+
+Returns a Float between 0.0 (completely different) and 1.0 (identical).
 
 ### `Changeset`
 
@@ -67,6 +137,8 @@ Returns a `Changeset` representing all structural differences.
 | `apply(hash)` | Applies changes to produce the new version |
 | `revert(hash)` | Reverts changes to produce the old version |
 | `to_h` | Serializable hash representation |
+| `to_text` | Human-readable text with +/- prefixes |
+| `to_json_patch` | Array of RFC 6902 JSON Patch operations |
 
 ### `Change`
 
