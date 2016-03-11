@@ -32,7 +32,8 @@ module Philiprehberger
 
       def self.count_hash_key(old_hash, new_hash, key, full_path, opts)
         if old_hash.key?(key) && new_hash.key?(key)
-          count_fields(old_hash[key], new_hash[key], ignore: opts[:ignore], array_key: opts[:array_key], path: full_path)
+          count_fields(old_hash[key], new_hash[key],
+                       ignore: opts[:ignore], array_key: opts[:array_key], path: full_path)
         else
           1
         end
