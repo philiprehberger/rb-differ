@@ -6,9 +6,11 @@ Gem::Specification.new do |spec|
   spec.name = 'philiprehberger-differ'
   spec.version = Philiprehberger::Differ::VERSION
   spec.authors = ['Philip Rehberger']
-  spec.email = ['philiprehberger@gmail.com']
+  spec.email = ['me@philiprehberger.com']
 
   spec.summary = 'Deep structural diff for hashes, arrays, and nested objects'
+  spec.description = 'A Ruby library for deep structural diffing of hashes, arrays, and nested objects ' \
+                     'with apply/revert, JSON Patch output, similarity scoring, and configurable ignore paths.'
   spec.homepage = 'https://github.com/philiprehberger/rb-differ'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.1.0'
