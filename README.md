@@ -1,7 +1,7 @@
 # philiprehberger-differ
 
-[![Gem Version](https://badge.fury.io/rb/philiprehberger-differ.svg)](https://rubygems.org/gems/philiprehberger-differ)
 [![Tests](https://github.com/philiprehberger/rb-differ/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-differ/actions/workflows/ci.yml)
+[![Gem Version](https://badge.fury.io/rb/philiprehberger-differ.svg)](https://rubygems.org/gems/philiprehberger-differ)
 [![License](https://img.shields.io/github/license/philiprehberger/rb-differ)](LICENSE)
 
 Deep structural diff for hashes, arrays, and nested objects in Ruby
