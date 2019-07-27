@@ -27,7 +27,7 @@ gem install philiprehberger-differ
 ## Usage
 
 ```ruby
-require 'philiprehberger/differ'
+require "philiprehberger/differ"
 
 old_data = { name: 'Alice', age: 30, address: { city: 'Berlin' } }
 new_data = { name: 'Alice', age: 31, address: { city: 'Vienna' }, email: 'alice@example.com' }
