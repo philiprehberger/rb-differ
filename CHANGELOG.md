@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-01
+
+### Added
+- `Differ.subset(changeset, path)` for filtering changes by path prefix
+- `Differ.merge(base, theirs, ours)` for three-way merge with conflict detection
+- `Differ.breaking_changes?(changeset)` for detecting removals and type changes
+
 ## [0.2.9] - 2026-03-31
 
 ### Added
