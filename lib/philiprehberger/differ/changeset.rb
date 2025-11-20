@@ -3,10 +3,50 @@
 module Philiprehberger
   module Differ
     class Changeset
+      include Enumerable
+
       attr_reader :changes
 
       def initialize(changes = [])
         @changes = changes
+      end
+
+      # Iterate over each Change.
+      #
+      # @yield [Change] each change
+      # @return [Enumerator] if no block given
+      def each(&)
+        @changes.each(&)
+      end
+
+      # Number of changes.
+      #
+      # @return [Integer]
+      def count
+        @changes.length
+      end
+
+      # Array of all changed paths.
+      #
+      # @return [Array<String>]
+      def paths
+        @changes.map(&:path)
+      end
+
+      # Check if a specific path was changed.
+      #
+      # @param path [String, Symbol] the path to check
+      # @return [Boolean]
+      def include?(path)
+        path_s = path.to_s
+        @changes.any? { |c| c.path.to_s == path_s }
+      end
+
+      # Summary counts by change type.
+      #
+      # @return [Hash{Symbol => Integer}] { added:, removed:, changed: }
+      def summary
+        { added: added.length, removed: removed.length, changed: changed.length }
       end
 
       def changed?
