@@ -41,6 +41,14 @@ module Philiprehberger
         { changes: @changes.map(&:to_h) }
       end
 
+      def to_text
+        Formatters::Text.format(self)
+      end
+
+      def to_json_patch
+        Formatters::JsonPatch.format(self)
+      end
+
       private
 
       def apply_change(hash, change)
