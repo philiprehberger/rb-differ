@@ -21,17 +21,18 @@ module Philiprehberger
       end
 
       def self.count_hash_fields(old_hash, new_hash, ignore, array_key, path)
+        opts = { ignore: ignore, array_key: array_key }
         (old_hash.keys + new_hash.keys).uniq.sum do |key|
           full_path = path.empty? ? key.to_s : "#{path}.#{key}"
           next 0 if ignore.any? { |p| p.to_s == full_path }
 
-          count_hash_key(old_hash, new_hash, key, full_path, ignore, array_key)
+          count_hash_key(old_hash, new_hash, key, full_path, opts)
         end
       end
 
-      def self.count_hash_key(old_hash, new_hash, key, full_path, ignore, array_key)
+      def self.count_hash_key(old_hash, new_hash, key, full_path, opts)
         if old_hash.key?(key) && new_hash.key?(key)
-          count_fields(old_hash[key], new_hash[key], ignore: ignore, array_key: array_key, path: full_path)
+          count_fields(old_hash[key], new_hash[key], ignore: opts[:ignore], array_key: opts[:array_key], path: full_path)
         else
           1
         end
@@ -56,8 +57,12 @@ module Philiprehberger
       end
 
       def self.count_keyed_array(old_arr, new_arr, ignore, array_key, path)
-        old_map = old_arr.each_with_object({}) { |item, m| m[item[array_key]] = item }
-        new_map = new_arr.each_with_object({}) { |item, m| m[item[array_key]] = item }
+        old_map = old_arr.to_h { |item| [item[array_key], item] }
+        new_map = new_arr.to_h { |item| [item[array_key], item] }
+        count_keyed_array_fields(old_map, new_map, ignore, array_key, path)
+      end
+
+      def self.count_keyed_array_fields(old_map, new_map, ignore, array_key, path)
         (old_map.keys + new_map.keys).uniq.sum do |key_val|
           full_path = "#{path}.#{key_val}"
           next 1 unless old_map.key?(key_val) && new_map.key?(key_val)
@@ -67,7 +72,8 @@ module Philiprehberger
       end
 
       private_class_method :count_fields, :count_hash_fields, :count_hash_key,
-                           :count_array_fields, :count_indexed_array, :count_keyed_array
+                           :count_array_fields, :count_indexed_array, :count_keyed_array,
+                           :count_keyed_array_fields
     end
   end
 end
