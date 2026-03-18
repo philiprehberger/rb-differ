@@ -1,9 +1,10 @@
 # philiprehberger-differ
 
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-differ.svg)](https://rubygems.org/gems/philiprehberger-differ)
+[![Tests](https://github.com/philiprehberger/rb-differ/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-differ/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/philiprehberger/rb-differ)](LICENSE)
 
-Deep structural diff for hashes, arrays, and nested objects in Ruby.
+Deep structural diff for hashes, arrays, and nested objects in Ruby
 
 ## Requirements
 
@@ -19,7 +20,7 @@ gem 'philiprehberger-differ'
 
 Or install directly:
 
-```sh
+```bash
 gem install philiprehberger-differ
 ```
 
@@ -153,9 +154,10 @@ Returns a Float between 0.0 (completely different) and 1.0 (identical).
 
 ## Development
 
-```sh
+```bash
 bundle install
-bundle exec rspec
+bundle exec rspec      # Run tests
+bundle exec rubocop    # Check code style
 ```
 
 ## License
