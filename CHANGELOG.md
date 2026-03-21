@@ -26,8 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - JSON Patch formatter: `changeset.to_json_patch` for RFC 6902 operations
 - Nested array diff by key: `Differ.diff(a, b, array_key: :id)` matches elements by field
 
-## [0.1.2]
+## [0.1.2] - 2026-03-16
 
+### Changed
 - Add License badge to README
 - Add bug_tracker_uri to gemspec
 - Add Requirements section to README
