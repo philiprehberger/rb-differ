@@ -15,7 +15,7 @@ Deep structural diff for hashes, arrays, and nested objects in Ruby
 Add to your Gemfile:
 
 ```ruby
-gem 'philiprehberger-differ'
+gem "philiprehberger-differ"
 ```
 
 Or install directly:
@@ -156,8 +156,8 @@ Returns a Float between 0.0 (completely different) and 1.0 (identical).
 
 ```bash
 bundle install
-bundle exec rspec      # Run tests
-bundle exec rubocop    # Check code style
+bundle exec rspec
+bundle exec rubocop
 ```
 
 ## License
