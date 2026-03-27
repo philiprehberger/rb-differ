@@ -27,13 +27,15 @@ module Philiprehberger
 
       def apply(hash)
         result = deep_dup(hash)
-        @changes.each { |c| apply_change(result, c) }
+        sorted = sort_for_apply(@changes)
+        sorted.each { |c| apply_change(result, c) }
         result
       end
 
       def revert(hash)
         result = deep_dup(hash)
-        @changes.each { |c| revert_change(result, c) }
+        sorted = sort_for_revert(@changes)
+        sorted.each { |c| revert_change(result, c) }
         result
       end
 
@@ -92,6 +94,21 @@ module Philiprehberger
 
       def symbol_keys?(hash)
         hash.keys.any?(Symbol)
+      end
+
+      def sort_for_apply(changes)
+        removals, others = changes.partition { |c| c.type == :removed }
+        others + removals.sort_by { |c| -(last_index(c.path) || 0) }
+      end
+
+      def sort_for_revert(changes)
+        additions, others = changes.partition { |c| c.type == :added }
+        others + additions.sort_by { |c| -(last_index(c.path) || 0) }
+      end
+
+      def last_index(path)
+        last = path.to_s.split('.').last
+        last&.match?(/\A\d+\z/) ? last.to_i : nil
       end
 
       def deep_dup(obj)
