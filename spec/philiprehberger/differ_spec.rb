@@ -978,4 +978,82 @@ RSpec.describe Philiprehberger::Differ do
       expect(result['name']).to eq('Alice')
     end
   end
+
+  describe '.subset' do
+    it 'filters changes by path prefix' do
+      changeset = described_class.diff(
+        { 'user' => { 'name' => 'Alice', 'age' => 30 }, 'meta' => { 'version' => 1 } },
+        { 'user' => { 'name' => 'Bob', 'age' => 31 }, 'meta' => { 'version' => 2 } }
+      )
+      result = described_class.subset(changeset, 'user')
+      expect(result.changes.length).to eq(2)
+      result.changes.each do |change|
+        expect(change.path).to start_with('user')
+      end
+    end
+
+    it 'returns empty changeset for non-matching prefix' do
+      changeset = described_class.diff({ 'a' => 1 }, { 'a' => 2 })
+      result = described_class.subset(changeset, 'b')
+      expect(result.changes).to be_empty
+    end
+
+    it 'includes exact path match' do
+      changeset = described_class.diff({ 'name' => 'Alice' }, { 'name' => 'Bob' })
+      result = described_class.subset(changeset, 'name')
+      expect(result.changes.length).to eq(1)
+    end
+  end
+
+  describe '.merge' do
+    it 'merges non-conflicting changes' do
+      base = { 'name' => 'Alice', 'age' => 30 }
+      theirs = { 'name' => 'Bob', 'age' => 30 }
+      ours = { 'name' => 'Alice', 'age' => 31 }
+      result = described_class.merge(base, theirs, ours)
+      expect(result[:merged]['name']).to eq('Bob')
+      expect(result[:merged]['age']).to eq(31)
+      expect(result[:conflicts]).to be_empty
+    end
+
+    it 'detects conflicting changes' do
+      base = { 'name' => 'Alice' }
+      theirs = { 'name' => 'Bob' }
+      ours = { 'name' => 'Charlie' }
+      result = described_class.merge(base, theirs, ours)
+      expect(result[:conflicts].length).to eq(1)
+      expect(result[:conflicts][0][:path]).to eq('name')
+    end
+
+    it 'preserves unchanged values' do
+      base = { 'name' => 'Alice', 'age' => 30 }
+      theirs = { 'name' => 'Alice', 'age' => 31 }
+      ours = { 'name' => 'Alice', 'age' => 30 }
+      result = described_class.merge(base, theirs, ours)
+      expect(result[:merged]['name']).to eq('Alice')
+      expect(result[:merged]['age']).to eq(31)
+    end
+  end
+
+  describe '.breaking_changes?' do
+    it 'detects removals as breaking' do
+      changeset = described_class.diff({ 'a' => 1, 'b' => 2 }, { 'a' => 1 })
+      expect(described_class.breaking_changes?(changeset)).to be true
+    end
+
+    it 'detects type changes as breaking' do
+      changeset = described_class.diff({ 'a' => 'string' }, { 'a' => 42 })
+      expect(described_class.breaking_changes?(changeset)).to be true
+    end
+
+    it 'does not flag value changes of same type' do
+      changeset = described_class.diff({ 'a' => 1 }, { 'a' => 2 })
+      expect(described_class.breaking_changes?(changeset)).to be false
+    end
+
+    it 'does not flag additions' do
+      changeset = described_class.diff({ 'a' => 1 }, { 'a' => 1, 'b' => 2 })
+      expect(described_class.breaking_changes?(changeset)).to be false
+    end
+  end
 end

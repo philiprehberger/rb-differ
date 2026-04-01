@@ -116,6 +116,29 @@ new_data = { users: [{ id: 2, name: 'Bobby' }, { id: 1, name: 'Alice' }] }
 changeset = Philiprehberger::Differ.diff(old_data, new_data, array_key: :id)
 ```
 
+### Subset Filtering
+
+Filter a diff to only changes under a specific path:
+
+```ruby
+changeset = Philiprehberger::Differ.diff(old_data, new_data)
+user_changes = Philiprehberger::Differ.subset(changeset, 'user')
+```
+
+### Three-Way Merge
+
+```ruby
+result = Philiprehberger::Differ.merge(base, theirs, ours)
+result[:merged]     # => merged hash
+result[:conflicts]  # => [{ path:, theirs:, ours: }]
+```
+
+### Breaking Change Detection
+
+```ruby
+Philiprehberger::Differ.breaking_changes?(changeset)  # => true/false
+```
+
 ## API
 
 ### `Philiprehberger::Differ.diff(old_val, new_val, ignore: [], array_key: nil)`
@@ -140,6 +163,12 @@ Returns a Float between 0.0 (completely different) and 1.0 (identical).
 | `to_h` | Serializable hash representation |
 | `to_text` | Human-readable text with +/- prefixes |
 | `to_json_patch` | Array of RFC 6902 JSON Patch operations |
+
+| Method | Description |
+|---|---|
+| `Differ.subset(changeset, path)` | Filter changes to a specific path prefix |
+| `Differ.merge(base, theirs, ours)` | Three-way merge with conflict detection |
+| `Differ.breaking_changes?(changeset)` | Detect removals and type changes |
 
 ### `Change`
 
