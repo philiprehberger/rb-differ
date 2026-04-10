@@ -1056,4 +1056,75 @@ RSpec.describe Philiprehberger::Differ do
       expect(described_class.breaking_changes?(changeset)).to be false
     end
   end
+
+  describe 'Changeset Enumerable and helpers' do
+    let(:changeset) do
+      described_class.diff(
+        { name: 'Alice', age: 30, city: 'Berlin' },
+        { name: 'Bob', email: 'bob@example.com' }
+      )
+    end
+
+    describe '#each' do
+      it 'yields each change' do
+        types = changeset.map(&:type)
+        expect(types).to include(:changed, :removed, :added)
+      end
+
+      it 'returns an enumerator without a block' do
+        expect(changeset.each).to be_an(Enumerator)
+      end
+    end
+
+    describe '#count' do
+      it 'returns the number of changes' do
+        expect(changeset.count).to eq(changeset.changes.length)
+      end
+
+      it 'returns 0 for identical objects' do
+        cs = described_class.diff({ a: 1 }, { a: 1 })
+        expect(cs.count).to eq(0)
+      end
+    end
+
+    describe '#paths' do
+      it 'returns all changed paths' do
+        expect(changeset.paths).to include('name')
+      end
+
+      it 'returns empty array for identical objects' do
+        cs = described_class.diff({ a: 1 }, { a: 1 })
+        expect(cs.paths).to eq([])
+      end
+    end
+
+    describe '#include?' do
+      it 'returns true for a changed path' do
+        expect(changeset.include?('name')).to be true
+      end
+
+      it 'returns false for an unchanged path' do
+        expect(changeset.include?('missing')).to be false
+      end
+
+      it 'accepts symbols' do
+        expect(changeset.include?(:name)).to be true
+      end
+    end
+
+    describe '#summary' do
+      it 'returns counts by type' do
+        summary = changeset.summary
+        expect(summary).to have_key(:added)
+        expect(summary).to have_key(:removed)
+        expect(summary).to have_key(:changed)
+        expect(summary.values.sum).to eq(changeset.count)
+      end
+
+      it 'returns zeros for identical objects' do
+        cs = described_class.diff({ a: 1 }, { a: 1 })
+        expect(cs.summary).to eq({ added: 0, removed: 0, changed: 0 })
+      end
+    end
+  end
 end

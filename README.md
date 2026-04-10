@@ -154,6 +154,11 @@ Returns a Float between 0.0 (completely different) and 1.0 (identical).
 | Method | Description |
 |---|---|
 | `changed?` | Returns `true` if any differences exist |
+| `count` | Number of changes |
+| `paths` | Array of all changed paths |
+| `include?(path)` | Check if a specific path was changed |
+| `summary` | `{ added:, removed:, changed: }` counts |
+| `each` | Iterate over changes (includes `Enumerable`) |
 | `changes` | All `Change` objects |
 | `added` | Changes where `type == :added` |
 | `removed` | Changes where `type == :removed` |

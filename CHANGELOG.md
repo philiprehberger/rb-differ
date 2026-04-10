@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-10
+
+### Added
+- `Changeset` now includes `Enumerable` for direct iteration over changes
+- `Changeset#count` returning the number of changes
+- `Changeset#paths` returning all changed paths
+- `Changeset#include?(path)` to check if a specific path was changed
+- `Changeset#summary` returning `{ added:, removed:, changed: }` counts
+
 ## [0.3.0] - 2026-04-01
 
 ### Added
