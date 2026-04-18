@@ -56,6 +56,31 @@ module Philiprehberger
       { merged: merged, conflicts: conflicts }
     end
 
+    # Structured count summary of a changeset.
+    #
+    # Returns a hash of integer counts for the added, removed, and changed
+    # entries in the changeset, along with a running total and the number of
+    # unique paths. This method is read-only and never mutates the changeset.
+    #
+    # @param changeset [Changeset] the changeset to summarize
+    # @return [Hash{Symbol => Integer}] counts by kind — `{ added:, removed:, changed:, total:, paths: }`
+    # @raise [ArgumentError] if `changeset` is not a {Changeset}
+    def self.stats(changeset)
+      raise ArgumentError, 'changeset must be a Philiprehberger::Differ::Changeset' unless changeset.is_a?(Changeset)
+
+      added   = changeset.added.length
+      removed = changeset.removed.length
+      changed = changeset.changed.length
+
+      {
+        added: added,
+        removed: removed,
+        changed: changed,
+        total: added + removed + changed,
+        paths: changeset.paths.length
+      }
+    end
+
     # Detect if a changeset contains breaking changes (removals or type changes)
     #
     # @param changeset [Changeset] the changeset to check

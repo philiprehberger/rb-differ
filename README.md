@@ -139,6 +139,20 @@ result[:conflicts]  # => [{ path:, theirs:, ours: }]
 Philiprehberger::Differ.breaking_changes?(changeset)  # => true/false
 ```
 
+### Change Statistics
+
+Get a structured count summary of a changeset:
+
+```ruby
+changeset = Philiprehberger::Differ.diff(
+  { name: 'Alice', age: 30, id: 1 },
+  { name: 'Bob', email: 'bob@example.com' }
+)
+
+Philiprehberger::Differ.stats(changeset)
+# => { added: 1, removed: 2, changed: 1, total: 4, paths: 4 }
+```
+
 ## API
 
 ### `Philiprehberger::Differ.diff(old_val, new_val, ignore: [], array_key: nil)`
@@ -174,6 +188,7 @@ Returns a Float between 0.0 (completely different) and 1.0 (identical).
 | `Differ.subset(changeset, path)` | Filter changes to a specific path prefix |
 | `Differ.merge(base, theirs, ours)` | Three-way merge with conflict detection |
 | `Differ.breaking_changes?(changeset)` | Detect removals and type changes |
+| `.stats(changeset)` | Count summary of a changeset |
 
 ### `Change`
 
