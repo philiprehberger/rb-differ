@@ -1127,4 +1127,61 @@ RSpec.describe Philiprehberger::Differ do
       end
     end
   end
+
+  describe '.stats' do
+    it 'returns expected counts for a mixed changeset' do
+      old_hash = { name: 'Alice', age: 30, id: 1 }
+      new_hash = { name: 'Bob', email: 'bob@example.com' }
+      changeset = described_class.diff(old_hash, new_hash)
+
+      stats = described_class.stats(changeset)
+
+      expect(stats[:added]).to eq(1)
+      expect(stats[:removed]).to eq(2)
+      expect(stats[:changed]).to eq(1)
+      expect(stats[:total]).to eq(4)
+      expect(stats[:paths]).to eq(changeset.paths.length)
+    end
+
+    it 'handles an all-added changeset' do
+      changeset = described_class.diff({}, { a: 1, b: 2, c: 3 })
+
+      stats = described_class.stats(changeset)
+
+      expect(stats).to eq(added: 3, removed: 0, changed: 0, total: 3, paths: 3)
+    end
+
+    it 'returns all zeros for an empty changeset' do
+      changeset = described_class.diff({ a: 1 }, { a: 1 })
+
+      stats = described_class.stats(changeset)
+
+      expect(stats).to eq(added: 0, removed: 0, changed: 0, total: 0, paths: 0)
+    end
+
+    it 'ensures total always equals added + removed + changed' do
+      old_hash = { a: 1, b: 2, c: 3, d: 4 }
+      new_hash = { a: 1, b: 99, e: 5, f: 6 }
+      changeset = described_class.diff(old_hash, new_hash)
+
+      stats = described_class.stats(changeset)
+
+      expect(stats[:total]).to eq(stats[:added] + stats[:removed] + stats[:changed])
+    end
+
+    it 'does not mutate the changeset' do
+      changeset = described_class.diff({ a: 1 }, { a: 2, b: 3 })
+      before = changeset.changes.dup
+
+      described_class.stats(changeset)
+
+      expect(changeset.changes).to eq(before)
+    end
+
+    it 'raises ArgumentError when passed a non-Changeset' do
+      expect { described_class.stats([]) }.to raise_error(ArgumentError)
+      expect { described_class.stats(nil) }.to raise_error(ArgumentError)
+      expect { described_class.stats({ added: 1 }) }.to raise_error(ArgumentError)
+    end
+  end
 end
