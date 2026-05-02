@@ -125,6 +125,17 @@ changeset = Philiprehberger::Differ.diff(old_data, new_data)
 user_changes = Philiprehberger::Differ.subset(changeset, 'user')
 ```
 
+### Inverting a Diff
+
+Return the inverse of a changeset — additions and removals swap, and
+changed values are reversed. Applying the inverse undoes the original:
+
+```ruby
+forward = Philiprehberger::Differ.diff(old_data, new_data)
+reverse = Philiprehberger::Differ.invert(forward)
+reverse.apply(forward.apply(old_data)) # => old_data
+```
+
 ### Three-Way Merge
 
 ```ruby
@@ -186,6 +197,7 @@ Returns a Float between 0.0 (completely different) and 1.0 (identical).
 | Method | Description |
 |---|---|
 | `Differ.subset(changeset, path)` | Filter changes to a specific path prefix |
+| `Differ.invert(changeset)` | Return a new changeset that reverses the original |
 | `Differ.merge(base, theirs, ours)` | Three-way merge with conflict detection |
 | `Differ.breaking_changes?(changeset)` | Detect removals and type changes |
 | `.stats(changeset)` | Count summary of a changeset |

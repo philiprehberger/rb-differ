@@ -1005,6 +1005,39 @@ RSpec.describe Philiprehberger::Differ do
     end
   end
 
+  describe '.invert' do
+    it 'swaps additions and removals' do
+      changeset = described_class.diff({ 'a' => 1 }, { 'a' => 1, 'b' => 2 })
+      inverted = described_class.invert(changeset)
+      expect(inverted.changes.length).to eq(1)
+      expect(inverted.changes.first.type).to eq(:removed)
+      expect(inverted.changes.first.path).to eq('b')
+      expect(inverted.changes.first.old_value).to eq(2)
+    end
+
+    it 'reverses changed values' do
+      changeset = described_class.diff({ 'a' => 1 }, { 'a' => 2 })
+      inverted = described_class.invert(changeset)
+      change = inverted.changes.first
+      expect(change.type).to eq(:changed)
+      expect(change.old_value).to eq(2)
+      expect(change.new_value).to eq(1)
+    end
+
+    it 'undoes the original changeset when applied after it' do
+      old = { 'a' => 1, 'b' => 2 }
+      new = { 'a' => 5, 'c' => 3 }
+      forward = described_class.diff(old, new)
+      reverse = described_class.invert(forward)
+      applied = forward.apply(old)
+      expect(reverse.apply(applied)).to eq(old)
+    end
+
+    it 'raises ArgumentError on non-Changeset input' do
+      expect { described_class.invert([]) }.to raise_error(ArgumentError)
+    end
+  end
+
   describe '.merge' do
     it 'merges non-conflicting changes' do
       base = { 'name' => 'Alice', 'age' => 30 }

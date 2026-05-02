@@ -33,6 +33,40 @@ module Philiprehberger
       Changeset.new(filtered)
     end
 
+    # Return the inverse of a changeset.
+    #
+    # Additions become removals (and vice versa), and changed entries swap
+    # their old and new values. Applying the inverted changeset to a hash
+    # that has already had the original changeset applied will undo it
+    # without keeping the prior state around.
+    #
+    # @param changeset [Changeset] the changeset to invert
+    # @return [Changeset] a new changeset with each change reversed
+    # @raise [ArgumentError] if `changeset` is not a {Changeset}
+    def self.invert(changeset)
+      raise ArgumentError, 'changeset must be a Philiprehberger::Differ::Changeset' unless changeset.is_a?(Changeset)
+
+      reversed = changeset.changes.map do |change|
+        case change.type
+        when :added
+          Change.new(path: change.path, type: :removed, old_value: change.new_value)
+        when :removed
+          Change.new(path: change.path, type: :added, new_value: change.old_value)
+        when :changed
+          Change.new(
+            path: change.path,
+            type: :changed,
+            old_value: change.new_value,
+            new_value: change.old_value
+          )
+        else
+          change
+        end
+      end
+
+      Changeset.new(reversed)
+    end
+
     # Perform a three-way merge with conflict detection
     #
     # @param base [Hash] the common ancestor
